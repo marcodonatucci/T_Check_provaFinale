@@ -1,11 +1,17 @@
 import flet as ft
 
+#  il file view.py contiene tutte le specifiche riguardanti lo stile della GUI 
+
 
 class View(ft.UserControl):
 
     def __init__(self, page: ft.Page):
         super().__init__()
         # page stuff
+        self.filePicker = None
+        self.btn_esc = None
+        self.btn_no_lettore = None
+        self.btn_lettore = None
         self.txt_cliente = None
         self.btn_termina = None
         self.txt_final = None
@@ -34,7 +40,7 @@ class View(ft.UserControl):
         self._page.scroll = ft.ScrollMode.HIDDEN
         self._page.theme_mode = ft.ThemeMode.SYSTEM
         self.logo = ft.Image(
-            src="/images/TOP FLY ROSSO.png",
+            src="/images/T_check_per_splash-removebg.png",
             width=200,
             height=100,
             fit=ft.ImageFit.CONTAIN,
@@ -47,6 +53,7 @@ class View(ft.UserControl):
         self.username = None
 
     def load_login_interface(self):
+        """Interfaccia di login (pagina iniziale)"""
         #  logo
         # self._page.auto_scroll=True
         self._page.controls.append(ft.Container(padding=ft.padding.only(top=60), content=self.logo))
@@ -83,19 +90,23 @@ class View(ft.UserControl):
         self._page.update()
 
     def load_search_interface(self):
+        """Interfaccia di ricerca tramite IMEI e caricamento immagini con QR code"""
         # AppBar
         self.appBar = ft.AppBar(title=ft.Text('Ricerca dispositivo', color='white', font_family='Helvetica',
                                               weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.HEADLINE_SMALL),
                                 bgcolor='red')
         self._page.controls.append(self.appBar)
-        #  row3: ricerca imei
+        #  row: ricerca imei
         self.ddType = ft.Dropdown(label="Tipo di dispositivo", width=300, focused_border_color='red')
         self.controller.fillDdType()
         self._page.controls.append(ft.Container(self.ddType, padding=20))
+        self.icon_qr_search = ft.IconButton(icon=ft.icons.CAMERA_ALT_ROUNDED, icon_color='red',
+                                 on_click=self.controller.display_qr_dialog)
         self.txt_imei = ft.TextField(
             label="IMEI",
             width=300,
             focused_border_color='red',
+            suffix=self.icon_qr_search
         )
         self._page.controls.append(ft.Container(self.txt_imei, padding=ft.padding.only(bottom=20)))
         self.btn_search = ft.ElevatedButton(text="Cerca", on_click=self.controller.handle_search,
@@ -114,9 +125,13 @@ class View(ft.UserControl):
         self.btn_call = ft.FloatingActionButton(text="Contatta il tecnico", icon=ft.icons.CALL_ROUNDED,
                                                 on_click=self.controller.handle_call, bgcolor='red')
         self._page.controls.append(self.btn_call)
+        #  File picker per il caricamento delle immagini dalla galleria
+        self.filePicker = ft.FilePicker(on_result=self.controller.handle_search_qr)
+        self._page.overlay.append(self.filePicker)
         self._page.update()
 
     def load_results_interface(self):
+        """Interfaccia dei risultati della ricerca e dei comandi possibili sul tipo di dispositivo"""
         self.appBar = ft.AppBar(leading=ft.IconButton(icon=ft.icons.ARROW_BACK_ROUNDED,
                                                       icon_color='white',
                                                       on_click=self.controller.back),
@@ -130,6 +145,12 @@ class View(ft.UserControl):
         #  btn blocca motore e tacho
         self.btn_blocco = ft.ElevatedButton(text="Blocca motore", disabled=True, on_click=self.controller.handle_blocco,
                                             bgcolor='red', color='white', width=200)
+        self.btn_lettore = ft.ElevatedButton(text="Abilita lettore", disabled=True,
+                                             on_click=self.controller.handle_lettore,
+                                             bgcolor='red', color='white', width=200)
+        self.btn_no_lettore = ft.ElevatedButton(text="Disabilita lettore", disabled=True,
+                                                on_click=self.controller.handle_no_lettore,
+                                                bgcolor='red', color='white', width=200)
         self.btn_tacho = ft.ElevatedButton(text="Tacho check", disabled=True, on_click=self.controller.handle_tacho,
                                            bgcolor='red', color='white', width=200)
         self.btn_sblocco = ft.ElevatedButton(text="Sblocca motore", disabled=True,
@@ -152,6 +173,8 @@ class View(ft.UserControl):
                                            weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM))
         self._page.controls.append(ft.Container(self.btn_blocco, padding=10))
         self._page.controls.append(ft.Container(self.btn_sblocco, padding=10))
+        self._page.controls.append(ft.Container(self.btn_lettore, padding=10))
+        self._page.controls.append(ft.Container(self.btn_no_lettore, padding=10))
         self._page.controls.append(ft.Container(self.btn_tacho, padding=10))
         self._page.controls.append(ft.Container(padding=10, content=self.btn_nome))
         self._page.controls.append(ft.Container(padding=ft.padding.only(top=10, bottom=20), content=self.btn_fine))
@@ -175,6 +198,7 @@ class View(ft.UserControl):
         self._page.update()
 
     def load_final_interface(self):
+        """Interfaccia per il termine del collaudo (pagina finale)"""
         self.appBar = ft.AppBar(leading=ft.IconButton(icon=ft.icons.ARROW_BACK_ROUNDED,
                                                       icon_color='white',
                                                       on_click=self.controller.back),
@@ -229,6 +253,8 @@ class View(ft.UserControl):
         self._page.dialog = dlg
         dlg.open = True
         self._page.update()
+        
+#  MODEL ALERT PERSONALIZZATI:
 
     def create_model_alert_nome(self):
         dlg = ft.AlertDialog(title=ft.Text("Cambia nome"),
@@ -248,6 +274,20 @@ class View(ft.UserControl):
                              actions=[
                                  ft.TextButton("Marco", on_click=self.controller.handle_call_Marco),
                                  ft.TextButton("Marisa", on_click=self.controller.handle_call_Marisa),
+                             ],
+                             actions_alignment=ft.MainAxisAlignment.END, adaptive=True)
+        self._page.dialog = dlg
+        dlg.open = True
+        self._page.update()
+    
+    def create_model_alert_qr(self):
+        dlg = ft.AlertDialog(title=ft.Text("Carica un immagine con codice QR"),
+                             content=ft.Text("Scatta una foto al codice QR e caricala per leggere i dati in automatico!"),
+                             actions=[
+                                 ft.TextButton("Seleziona",
+                                               on_click= lambda _: self.filePicker.pick_files(allow_multiple=False, 
+                                                                                            file_type=ft.FilePickerFileType.IMAGE)),
+                                 ft.TextButton("Annulla", on_click=self.controller.handle_no_collaudo),
                              ],
                              actions_alignment=ft.MainAxisAlignment.END, adaptive=True)
         self._page.dialog = dlg
