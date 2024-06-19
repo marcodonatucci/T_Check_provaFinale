@@ -1,4 +1,8 @@
 from Connection import device_DAO, connector
+from PIL import Image
+import re
+import cv2
+import numpy as np
 
 
 #  il file model.py si occupa dell'elaborazione dei dati e dei comandi, funge anche da interfaccia tra il controller
@@ -197,5 +201,26 @@ class Model:
 
     def read_qr_code(self, path):
         """Metodo per la lettura del qr code a partire da un file immagine"""
-        imei = self.connection.post_qr_code(path)
-        return imei
+        # Apro l'immagine dal percorso usando Pillow
+        image = Image.open(path)
+
+        # Converto l'immagine nel formato utilizzato da opencv (BGR) utilizzando un array numpy
+        open_cv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+
+        # Uso la classe QRCodeDetector per rilevare e decodificare il QR code
+        qr_detector = cv2.QRCodeDetector()
+        data, points, _ = qr_detector.detectAndDecode(open_cv_image)
+
+        # Se vengono rilevati i punti in cui è presente un codice qr viene restituito l'imei estratto
+        if points is not None:
+            return self.extract_imei(data)
+        else:
+            return None
+
+    @staticmethod
+    def extract_imei(decoded_results):
+        """Metodo per la ricerca del codice identificativo univoco del dispositivo (IMEI) nel testo di output del server"""
+        imei_match = re.search(r'IMEI:(\d+)', decoded_results)  # Cerca il campo IMEI 
+        if imei_match:
+            return imei_match.group(1)  # Restituisce solo il numero IMEI
+        return 'IMEI non riconosciuto!'

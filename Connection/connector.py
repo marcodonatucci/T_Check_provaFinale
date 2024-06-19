@@ -138,34 +138,5 @@ class Connection:
         # un indirizzo email a se stesso
         server.quit()
 
-    def post_qr_code(self, path):
-        """Metodo per l'invio di un file immagine al server ZXing per la decodifica del QR code"""
-        # URL dell'API di decodifica di ZXing
-        zxing_api_url = 'https://zxing.org/w/decode'
-        # Percorso dell'immagine da decodificare 
-        image_path = path
-        try:
-            with open(image_path, 'rb') as file:
-                # Crea un dizionario dei file per inviare l'immagine come file binario
-                files = {'file': file}
-                # Invia la richiesta POST all'API di ZXing
-                response = requests.post(zxing_api_url, files=files)
-                # Controlla se la richiesta ha avuto successo
-                print(response.status_code)
-                if response.status_code == 200:
-                    # Estrai i dati decodificati dalla risposta JSON
-                    decoded_data = response.content
-                    imei = extract_imei(str(decoded_data))
-                    return imei
-                else:
-                    return False
-        except e:
-            return 'File non trovato!'
 
 
-def extract_imei(decoded_results):
-    """Metodo per la ricerca del codice identificativo univoco del dispositivo (IMEI) nel testo di output del server"""
-    imei_match = re.search(r'IMEI:(\d+)', decoded_results)  # Cerca il campo IMEI 
-    if imei_match:
-        return imei_match.group(1)  # Restituisce solo il numero IMEI
-    return 'IMEI non riconosciuto!'

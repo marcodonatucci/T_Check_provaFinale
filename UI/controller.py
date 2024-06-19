@@ -2,6 +2,7 @@ import pathlib
 import time
 import flet as ft
 
+
 #  il file controller.py gestisce le interazioni tra gli oggetti della view 
 #  e funge da interfaccia tra input dell'utente e la classe model
 
@@ -388,11 +389,11 @@ class Controller:
 
     def handle_call_Marco(self, e):
         #  esegue il metodo per effettuare la telefonata
-        self._model.doCall('+393519297869')
+        self._model.doCall('+390000000000')
 
     def handle_call_Marisa(self, e):
         #  esegue il metodo per effettuare la telefonata
-        self._model.doCall('+393386083090')
+        self._model.doCall('+390000000000')
 
     def display_qr_dialog(self, e):
         #  al click del bottone con l'icona della fotocamera nel campo di ricerca apre il model alert per selezionare 
