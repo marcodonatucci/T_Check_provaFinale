@@ -132,8 +132,8 @@ class Connection:
         encoded_message = full_message.encode('utf-8')
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
-        server.login('collaudotopfly@gmail.com', 'mkut jets fifq fehz')
-        server.sendmail('collaudotopfly@gmail.com', 'collaudotopfly@gmail.com', encoded_message)
+        server.login('s293556@studenti.polito.it', 'password per app')
+        server.sendmail('s293556@studenti.polito.it', 's293556@studenti.polito.it', encoded_message)
         # l'e-mail serve all'azienda per tenere traccia dei collaudi che avvengono, la mail viene quindi mandata da 
         # un indirizzo email a se stesso
         server.quit()
