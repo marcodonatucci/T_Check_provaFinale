@@ -17,7 +17,7 @@ class Model:
 
     def setDevice(self, imei, selected_type):
         self.device = device_DAO.getDevice(imei, selected_type, self.connection)
-
+        
     def setConnection(self):
         self.connection = connector.Connection()
 
@@ -71,6 +71,7 @@ class Model:
             return output
         else:
             return False
+        
 
     def doSblocco(self):
         """Metodo per l'inoltro del comando sblocca motore"""

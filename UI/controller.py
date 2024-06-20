@@ -60,7 +60,9 @@ class Controller:
             self._view.update_page()
             return
         #  viene settato il device sul model e vengono cercati tutti i dati
+        search_start_time = time.time()
         self._model.setDevice(imei, self._view.ddType.value)
+    
         #  timer di attesa massima in caso il device rimanga None per problemi di input o connessione
         tempo_di_attesa = 10
         start_time = time.time()
@@ -69,6 +71,8 @@ class Controller:
                 break
             else:
                 pass
+        search_end_time = time.time()
+        print(f"Algoritmo di ricerca: {search_end_time-search_start_time}")
         #  controlli sull'output 
         if self._model.device is None:
             self._view.txt_result.controls.append(
@@ -122,6 +126,7 @@ class Controller:
         username = self._view.txt_username.value.replace(" ", "")
         password = self._view.txt_password.value.replace(" ", "")
         #  viene settato il token della connessione 
+        login_start_time = time.time()
         self._model.setToken(username, password)
         #  timer di attesa massima in caso il device rimanga None per problemi di input o connessione
         tempo_di_attesa = 10
@@ -131,6 +136,8 @@ class Controller:
                 break
             else:
                 pass
+        login_end_time = time.time()
+        print(f"Algoritmo di autenticazione: {login_end_time-login_start_time}")
         if self._model.connection.token is None:
             self._view.txt_result.controls.append(
                 ft.Text("Accesso non riuscito! controlla username e password e riprova", color='red'))
@@ -213,6 +220,7 @@ class Controller:
         self._view.pr.visible = True
         self._view.update_page()
         #  viene chiamato il metodo del model
+        tacho_start_time = time.time()
         var = self._model.doTacho()
         #  timer di attesa massima in caso il device rimanga None per problemi di input o connessione
         tempo_di_attesa = 10
@@ -222,6 +230,8 @@ class Controller:
                 break
             else:
                 pass
+        tacho_end_time = time.time()
+        print(f"Algoritmo comando tacho: {tacho_end_time-tacho_start_time}")
         #  controlli sull'output e return del risultato
         if var:
             self._view.pr.visible = False
@@ -295,6 +305,7 @@ class Controller:
             return
         try:
             #  inoltra la mail con i dati del collaudo all'azienda
+            mail_start_time = time.time()
             self._model.doEmail(self._view.username, self._view.txt_final.value, self._view.txt_cliente.value)
         except:
             self._view.create_alert("Problemi riscontrati nel termine collaudo, contatta il tecnico!")
@@ -302,6 +313,8 @@ class Controller:
             self._view.update_page()
             return
         #  output e caricamento interfaccia di ricerca
+        mail_end_time = time.time()
+        print(f"Algoritmo email: {mail_end_time-mail_start_time}")
         self._view.create_alert("Collaudo terminato")
         self._model.device = None
         self._view.load_search_interface()
@@ -318,8 +331,11 @@ class Controller:
         self._view.update_page()
         nome = self._view._page.dialog.actions[0].value
         #  chiama il metodo del model per cambiare il nome
+        name_start_time = time.time()
         result = self._model.doName(nome)
         #  output
+        name_end_time = time.time()
+        print(f"Algoritmo cambio nome: {name_end_time-name_start_time}")
         if result:
             self._view.create_alert("Nome dispositivo cambiato")
         else:
@@ -414,6 +430,7 @@ class Controller:
         if self._view.filePicker.result is not None and self._view.filePicker.result.files is not None:
             var = self._view.filePicker.result.files
             #  esegue il metodo del model
+            qr_start_time = time.time()
             imei = self._model.read_qr_code(str(var[0].path))
             #  timer di attesa massima in caso il device rimanga None per problemi di input o connessione
             tempo_di_attesa = 10
@@ -423,6 +440,8 @@ class Controller:
                     break
                 else:
                     pass
+            qr_end_time = time.time()
+            print(f"Algoritmo ricerca con codice qr: {qr_end_time-qr_start_time}")
             #  controlli sull'output e return dei risultati
             if imei:
                 self._view.pr.visible = False

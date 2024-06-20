@@ -3,7 +3,7 @@ import webbrowser
 from urllib.parse import urlparse, parse_qs
 from wialon import Wialon, WialonError  # libreria per la connessione alla piattaforma dell'azienda, presa da github
 import re
-import libs.requests as requests
+import requests
 
 
 #  il file connector.py contiene tutti i metodi che si occupano di stabilire connessioni http e fare richieste ai server
@@ -132,8 +132,8 @@ class Connection:
         encoded_message = full_message.encode('utf-8')
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
-        server.login('s293556@studenti.polito.it', 'password per app')
-        server.sendmail('s293556@studenti.polito.it', 's293556@studenti.polito.it', encoded_message)
+        server.login('marco.donatucci02@gmail.com', 'akwm zcgl lkep ffvh')
+        server.sendmail('marco.donatucci02@gmail.com', 'marco.donatucci02@gmail.com', encoded_message)
         # l'e-mail serve all'azienda per tenere traccia dei collaudi che avvengono, la mail viene quindi mandata da 
         # un indirizzo email a se stesso
         server.quit()
